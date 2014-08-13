@@ -14,6 +14,10 @@ sudo apt-get install -y xauth >/dev/null 2>&1
 #  http://askubuntu.com/questions/147400/problems-with-eclipse-and-android-sdk
 sudo apt-get install -y ia32-libs >/dev/null 2>&1
 
+echo "Installing developer dependencies"
+sudo apt-get install -y build-essential
+sudo apt-get install -y git
+
 echo "Installing GCC for ARM cross-compilation"
 sudo apt-get install -y g++-4.6-arm-linux-gnueabihf
 sudo sh -c 'echo "foreign-architecture armhf" >> /etc/dpkg/dpkg.cfg.d/multiarch'
@@ -25,6 +29,7 @@ sudo curl -s -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu12
 sudo dpkg -i cuda-repo-ubuntu1204_6.0-37_amd64.deb
 sudo rm -rf /tmp/cuda-repo-ubuntu1204_6.0-37_amd64.deb
 sudo apt-get update
+sudo apt-get upgrade -y
 
 echo "Installing Cuda 6.0"
 sudo apt-get install cuda
