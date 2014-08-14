@@ -34,6 +34,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     chef.add_recipe "java"
 
+    chef.json = {
+      "java" => {
+        "install_flavor" => "oracle",
+        "jdk_version" => "7",
+        "oracle" => {
+          "accept_oracle_download_terms" => true
+        }
+      }
+    }
+
   end
 
   config.vm.provision "shell", inline: "echo Installing Cuda repository and dependencies"

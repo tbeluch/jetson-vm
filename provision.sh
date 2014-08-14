@@ -1,61 +1,67 @@
 #!/usr/bin/env bash
 
 echo "Installing System Tools..."
-sudo apt-get update -y >/dev/null 2>&1
-sudo apt-get install -y curl >/dev/null 2>&1
-sudo apt-get install -y unzip >/dev/null 2>&1
-sudo apt-get install -y libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 >/dev/null 2>&1
-sudo apt-get update >/dev/null 2>&1
-sudo apt-get install apt-file && apt-file update
-sudo apt-get install -y python-software-properties >/dev/null 2>&1
-sudo apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11
-sudo apt-get install -y xauth >/dev/null 2>&1
+apt-get update -y >/dev/null 2>&1
+apt-get install -y curl >/dev/null 2>&1
+apt-get install -y unzip >/dev/null 2>&1
+apt-get install -y libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 >/dev/null 2>&1
+apt-get update >/dev/null 2>&1
+apt-get install -y apt-file >/dev/null 2>&1
+apt-file update >/dev/null 2>&1
+apt-get install -y python-software-properties >/dev/null 2>&1
+apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11 >/dev/null 2>&1
+apt-get install -y xauth >/dev/null 2>&1
 
 #  http://askubuntu.com/questions/147400/problems-with-eclipse-and-android-sdk
-sudo apt-get install -y ia32-libs >/dev/null 2>&1
+apt-get install -y ia32-libs >/dev/null 2>&1
 
 echo "Installing developer dependencies"
-sudo apt-get install -y build-essential
-sudo apt-get install -y git
+apt-get install -y build-essential >/dev/null 2>&1
+apt-get install -y git >/dev/null 2>&1
 
 echo "Installing GCC for ARM cross-compilation"
-sudo apt-get install -y g++-4.6-arm-linux-gnueabihf
-sudo sh -c 'echo "foreign-architecture armhf" >> /etc/dpkg/dpkg.cfg.d/multiarch'
-sudo apt-get update
+apt-get install -y g++-4.6-arm-linux-gnueabihf >/dev/null 2>&1
+echo "foreign-architecture armhf" >> /etc/dpkg/dpkg.cfg.d/multiarch
+apt-get update >/dev/null 2>&1
 
 echo "Installing Cuda v6.0 repository..."
 cd /tmp
-sudo curl -s -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1204/x86_64/cuda-repo-ubuntu1204_6.0-37_amd64.deb
-sudo dpkg -i cuda-repo-ubuntu1204_6.0-37_amd64.deb
-sudo rm -rf /tmp/cuda-repo-ubuntu1204_6.0-37_amd64.deb
-sudo apt-get update
-sudo apt-get upgrade -y
+curl -s -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1204/x86_64/cuda-repo-ubuntu1204_6.0-37_amd64.deb
+dpkg -i cuda-repo-ubuntu1204_6.0-37_amd64.deb >/dev/null
+rm -rf /tmp/cuda-repo-ubuntu1204_6.0-37_amd64.deb
+apt-get update >/dev/null 2>&1
+apt-get upgrade -y >/dev/null 2>&1
 
-echo "Installing Cuda 6.0"
-sudo apt-get install cuda
+echo "Installing Cuda 6.0 cross-development"
+apt-get -y install cuda-cross cuda-cross-armhf >/dev/null 2>&1
 
-echo "Updating Environment"
-cd ~/
-cat << End >> .profile
+echo "NVidia NSight default workspace location hack (so you get your workspace in the shared folder)"
+sed -i 's/\@user.home\/cuda-workspace/\/vagrant\/cuda-workspace/g' /usr/local/cuda-6.0/libnsight/configuration/config.ini
+
+echo "Updating Environment for user vagrant"
+sudo -u vagrant bash <<"EndOfVagrantEnv"
+cat << End >> ~vagrant/.profile
  export PATH=/usr/local/cuda-6.0/bin:$PATH
  export LD_LIBRARY_PATH=/usr/local/cuda-6.0/lib64:$LD_LIBRARY_PATH
 End
+EndOfVagrantEnv
 
-echo "Installing Cuda Samples. Comment these lines if you don't want them"
-cd ~/
-sudo apt-get install -y cuda-samples-6-0
-/usr/local/cuda-6.0/bin/cuda-install-samples-6.0.sh cuda-samples
+echo "Installing Cuda Samples in user vagrant's homedir. Comment these lines if you don't want them"
+apt-get install -y cuda-samples-6-0 >/dev/null 2>&1
+sudo -u vagrant bash <<"EndOfVagrantCuda"
+/usr/local/cuda-6.0/bin/cuda-install-samples-6.0.sh ~vagrant/cuda-samples
+EndOfVagrantCuda
 
 # echo "Adding USB device driver information..."
 # echo "For more detail see http://developer.android.com/tools/device.html"
 #
-# sudo chmod a+r /etc/udev/rules.d/51-android.rules
+# chmod a+r /etc/udev/rules.d/51-android.rules
 #
-# sudo service udev restart
+# service udev restart
 #
-# sudo android update adb
-# sudo adb kill-server
-# sudo adb start-server
+# android update adb
+# adb kill-server
+# adb start-server
 #
 # echo " "
 # echo " "
@@ -95,11 +101,11 @@ echo "			$ vagrant up"
 echo " "
 echo " 	To use with VMware Fusion (OS X) (requires paid plug-in),"
 echo " "
-echo "			$ vagrant up --provider=vmware_fusion"
+echo "			$ vagrant up"
 echo " "
 echo " 	To use VMware Workstation (Windows, Linux) (requires paid plug-in),"
 echo " "
-echo "			$ vagrant up --provider=vmware_workstation"
+echo "			$ vagrant up"
 echo " "
 echo " "
 echo "See the included README.md for more detail on how to run and work with this VM."
