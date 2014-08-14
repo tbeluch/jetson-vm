@@ -36,16 +36,16 @@ Currently, it will provision a Jetson VM for Cuda cross-development with the fol
 
 2. Download or clone the project repository into the newly created directory on your local machine from one of the following sources,
 
-	Visit the Android-VM repository on GitHub,
+	Visit the Jetson-VM repository on GitHub,
 	[https://github.com/tbeluch/jetson-vm](https://github.com/tbeluch/jetson-vm)
 	or the original Android-VM repository form rickfarmer:
 	[https://github.com/rickfarmer/android-vm](https://github.com/rickfarmer/android-vm)
 
-	Clone the Android-VM repository directly from GitHub,
+	Clone the Jetson-VM repository directly from GitHub,
 
 	[https://github.com/tbeluch/jetson-vm.git](https://github.com/tbeluch/jetson-vm.git)
 
-	Download the Android-VM repository as a zip file,
+	Download the Jetson-VM repository as a zip file,
 
 	[https://github.com/tbeluch/jetson-vm/archive/master.zip](https://github.com/tbeluch/jetson-vm/archive/master.zip)
 
@@ -58,12 +58,13 @@ Note: Vagrant has a prerequisite of an installed and functioning version of one 
 * [VMware Workstation (windows, linux)](http://www.vmware.com/products/workstation/workstation-evaluation) (Trial)
 * [VirtualBox](https://www.virtualbox.org/wiki/Downloads) (Free)
 
-1. Download and install the latest version of Vagrant for your OS from  [https://www.vagrantup.com/downloads.html](vagrantup.com/)
+1. Download and install the latest version of Vagrant for your OS from  [vagrantup.com](https://www.vagrantup.com/downloads.html)
 
 2. If using VMware, install the purchased VMware Provider Plug-in as mentioned in the documentation
 
+3. If using OS X, you may need to install a X11 server such as [XQuartz](http://xquartz.macosforge.org/landing/) (Free)
 
-## Install the Android VM
+## Install the Jetson VM
 
 _Note: All the software needed is automatically downloaded as it is needed.  Several of the downloads are somewhat large.  Patience is a virtue while the automated installation is running._
 
@@ -81,11 +82,11 @@ _Note: All the software needed is automatically downloaded as it is needed.  Sev
 
 	For VMware Fusion,
 
-		$ vagrant up --provider=vmware_fusion
+		$ vagrant up
 
 	For VMware Workstation,
 
-		$ vagrant up --provider=vmware_workstation
+		$ vagrant up
 
 	_Note: As the Android VM build runs you will see various types of screen output from Vagrant, Chef and Shell scripts -- some of the dependency downloads and compilations require a bit of time.  Again, Patience is a virtue._
 3. Once the Android VM build provisioning process is complete, run the following to login via SSH,
@@ -98,12 +99,25 @@ _Note: All the software needed is automatically downloaded as it is needed.  Sev
 5. The Android development environment directories with eclipse, sdk and ndk are located in the directory `/usr/local/jetson/`.
 6. The VM has an internal `/vagrant` directory which maps to the directory created previously (i.e. the one from which you are running the Android VM on your local machine), e.g. `/opt/dev/jetson-vm` or `c:\projects\jetson-vm` maps to the internal VM directory `/vagrant`.
 
-	_The net effect is that anything you drop in your local working directory, e.g. e.g. /csci65/jetson-vm or c:\csci65\jetson-vm, can be accessed from within the VM by opening the directory "/vagrant" and vice-versa_
+	_The net effect is that anything you drop in your local working directory, e.g. e.g. /opt/dev/jetson-vm or c:\dev\jetson-vm, can be accessed from within the VM by opening the directory "/vagrant" and vice-versa_
 
+## Starting NVidia Nsight Eclipse Edition
 
-## Manually Configure the Jetson VM in the Virtualization Provider
+The Nsight Eclipse Edition can be run with the following command
 
-To connect an Android device you must manually setup a USB connection mapping for your Android device to the new VM
+	$ nsight
+
+The default workspace location has been setup to the /vagrant/cuda-workspace folder for simplifying data backup and file management.
+
+## Getting started with Cuda 6.0 cross development
+
+The following blog page from NVidia's developer blog explains how to get started with your Cuda cross development.
+Please note that everything is already installed for cross-developing Cuda apps in your vagrant box, and you should start at "Importing Your First Jetson TK1 CUDA Sample into Nsight"
+* [http://devblogs.nvidia.com/parallelforall/nvidia-nsight-eclipse-edition-for-jetson-tk1/](http://devblogs.nvidia.com/parallelforall/nvidia-nsight-eclipse-edition-for-jetson-tk1/)
+
+## Configure the connection to Jetson TK1 in the Virtualization Provider
+
+To connect a device you must manually setup a USB connection mapping for your Android device to the new VM
 
 This configuration will vary with your provider (hypervisor), VMware Fusion, Workstation, or VirtualBox.
 
@@ -165,30 +179,21 @@ In the base directory (e.g. `/csci65/android-vm`) where the `Vagrantfile` is loc
 
 - The basic workflow is,
 
-		$ vagrant up    # To start the VM using VirtualBox (default)
-or
+		$ vagrant up    # To start the VM using your default provider
 
-		$ vagrant up --provider=vmware_fusion     # To start the VM using VMware Fusion (vmware_workstation for Windows users)
-			*Spins up the Jetson VM and loads the Ubuntu Unity desktop UI*
+			*Spins up the Jetson VM
 		$ vagrant ssh
-			*At this point you are logged into the VM to do the cli work you want to do, e.g.*
-			$ lsusb
-			$ adb devices
-			$ adb shell
-			$ adb install
-			$ adb push
-			$ adb pull
-			... for more detail see [http://developer.android.com/tools/help/adb.html]
-
-		$ android (from the command line) see [http://developer.android.com/tools/projects/projects-cmdline.html]
+			*At this point you are logged into the VM to do the work you want to do. A X11 forwarding is automatically enabled if X11 is available on your machine
 
 		$ vagrant status
+			* gives you basic information about running boxes.
+
 		$ vagrant halt  # To shutdown the VM
 or
 
 		$ vagrant suspend  
 
-- These are the only commands you will likely use on a regular basis.  Vagrant manages everything for you, so there is no need to configure the VM from VMware or Virtual Box except to change the VM memory, CPU allocation, &amp; connect the Android USB device for connection via the Android `adb` command.
+- These are the only commands you will likely use on a regular basis.  Vagrant manages everything for you, so there is no need to configure the VM from VMware or Virtual Box except to change the VM memory, CPU allocation...
 
 If you are interested in the other options Vagrant offers, please see the man help file using,
 
@@ -197,6 +202,7 @@ If you are interested in the other options Vagrant offers, please see the man he
 
 ### References
 
-1. [Vagrant v2 documentation](http://docs.vagrantup.com/v2/getting-started/)
-2. [http://www.vagrantbox.es/](http://www.vagrantbox.es/)
-3. [Chef Cookbooks](http://community.opscode.com/cookbooks)
+1. [rickfarmer's Android-VM box forked and taken as an example in developing this Jetson VM Box](https://github.com/rickfarmer/android-vm)
+2. [Vagrant v2 documentation](http://docs.vagrantup.com/v2/getting-started/)
+3. [http://www.vagrantbox.es/](http://www.vagrantbox.es/)
+4. [Chef Cookbooks](http://community.opscode.com/cookbooks)
